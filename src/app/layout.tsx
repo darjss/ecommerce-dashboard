@@ -3,8 +3,9 @@ import "@/styles/globals.css";
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 import { Toaster } from "sonner";
-import { initializeLucia } from "@/auth";
+// import { initializeLucia } from "@/auth";
 import { ViewTransitions } from "next-view-transitions";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -15,8 +16,11 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  initializeLucia();
+  // initializeLucia();
+  const queryClient = new QueryClient()
   return (
+    <QueryClientProvider client={queryClient}>
+
     <ViewTransitions>
       <html lang="en" className={`${GeistSans.variable}`}>
         <body className="">
@@ -25,5 +29,6 @@ export default function RootLayout({
         </body>
       </html>
     </ViewTransitions>
+    </QueryClientProvider>
   );
 }

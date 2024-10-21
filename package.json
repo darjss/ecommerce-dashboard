@@ -51,6 +51,7 @@
     "nuqs": "^1.20.0",
     "react": "^19.0.0-rc-b8ae38f8-20241018",
     "react-dom": "^19.0.0-rc-b8ae38f8-20241018",
+    "server-only": "^0.0.1",
     "sonner": "^1.5.0",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
