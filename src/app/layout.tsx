@@ -17,18 +17,16 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   // initializeLucia();
-  const queryClient = new QueryClient()
   return (
-    <QueryClientProvider client={queryClient}>
+
 
     <ViewTransitions>
       <html lang="en" className={`${GeistSans.variable}`}>
-        <body className="">
+        <body className="bg-background text-foreground">
           {children}
           <Toaster />
         </body>
       </html>
     </ViewTransitions>
-    </QueryClientProvider>
   );
 }

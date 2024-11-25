@@ -18,12 +18,7 @@ import { usePathname } from "next/navigation";
 
 export function Header() {
   const pathname = usePathname();
-  const pathSegments = pathname
-    .split("/")
-    .filter((segment) => segment !== "")
-    .slice(1);
-  console.log(pathSegments);
-
+  const pathSegments = pathname.split("/").filter((segment) => segment !== "");
   return (
     <header className="sticky top-0 z-20 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
       <Sheet>

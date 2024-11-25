@@ -1,132 +1,89 @@
 'use client'
 
-import { useState } from 'react'
-import { Upload, Search, Loader2, X } from "lucide-react"
+import { useState, useCallback } from 'react'
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { getTopSearchResults, scrapeProductImages } from '@/server/actions/images'
-import { AmazonProductImages, AmazonScrapeProduct } from '@/utils/types'
+import { X, Upload, Image as ImageIcon } from "lucide-react"
+import useAddProductStore from "@/utils/stores/addProduct"
+import { useDropzone } from 'react-dropzone'
 
-export default function ProductImagesForm() {
-  const [searchTerm, setSearchTerm] = useState<string>('')
-  const [searchResults, setSearchResults] = useState<AmazonScrapeProduct[]>([])
-  const [selectedImages, setSelectedImages] = useState<string[]>([])
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [error, setError] = useState<string>('')
-
-  const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError('')
-    try {
-      const results = await getTopSearchResults(searchTerm)
-      setSearchResults(results)
-    } catch (err) {
-      setError('Failed to fetch search results. Please try again.')
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const handleProductSelect = async (product: AmazonScrapeProduct) => {
-    setIsLoading(true)
-    setError('')
-    try {
-      const images: AmazonProductImages = await scrapeProductImages(product.productUrl)
-      setSelectedImages(prevImages => [...prevImages, images.mainImageUrl, ...images.additionalImages])
-    } catch (err) {
-      setError('Failed to fetch product images. Please try again.')
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const handleManualUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const newImages = Array.from(e.target.files).map(file => URL.createObjectURL(file))
-      setSelectedImages(prevImages => [...prevImages, ...newImages])
-    }
-  }
-
-  const removeImage = (index: number) => {
-    setSelectedImages(prevImages => prevImages.filter((_, i) => i !== index))
-  }
+function ImagePreview() {
+  const { images, removeImage } = useAddProductStore()
 
   return (
-    <Card className="w-full max-w-2xl">
-      <CardHeader>
-        <CardTitle>Product Images</CardTitle>
-        <CardDescription>Upload or search for product images</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex gap-2">
-          <Input
-            type="text"
-            placeholder="Search Amazon products"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="flex-grow"
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4">
+      {images.map((image, index) => (
+        <div key={index} className="relative aspect-square group">
+          <img
+            src={image.imageUrl}
+            alt={`Product ${index + 1}`}
+            className="h-full w-full rounded-lg object-fit transition-opacity group-hover:opacity-75"
           />
-          <Button onClick={(e) => handleSearch(e as any)} disabled={isLoading}>
-            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+          <Button
+            variant="destructive"
+            size="icon"
+            className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity"
+            onClick={() => removeImage(index)}
+          >
+            <X className="h-4 w-4" />
           </Button>
-        </div>
-
-        {error && <p className="text-red-500 text-sm">{error}</p>}
-
-        {searchResults.length > 0 && (
-          <div className="grid grid-cols-3 gap-2">
-            {searchResults.map((product, index) => (
-              <Button
-                key={index}
-                variant="outline"
-                className="h-20 p-1"
-                onClick={() => handleProductSelect(product)}
-              >
-                <img src={product.thumbnailUrl} alt={product.productName} className="w-full h-full object-contain" />
-              </Button>
-            ))}
-          </div>
-        )}
-
-        <div className="grid grid-cols-4 gap-2">
-          {selectedImages.map((image, index) => (
-            <div key={index} className="relative aspect-square">
-              <img src={image} alt={`Product ${index + 1}`} className="w-full h-full object-cover rounded-md" />
-              <Button
-                variant="destructive"
-                size="icon"
-                className="absolute top-0 right-0 h-6 w-6"
-                onClick={() => removeImage(index)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          ))}
-          {selectedImages.length < 8 && (
-            <div className="flex aspect-square items-center justify-center rounded-md border border-dashed">
-              <label htmlFor="image-upload" className="cursor-pointer">
-                <Input
-                  id="image-upload"
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  className="hidden"
-                  onChange={handleManualUpload}
-                />
-                <Upload className="h-6 w-6 text-muted-foreground" />
-              </label>
-            </div>
+          {image.isMain && (
+            <span className="absolute bottom-2 left-2 bg-primary text-primary-foreground text-xs font-medium px-2 py-1 rounded-full">
+              Main Image
+            </span>
           )}
         </div>
-      </CardContent>
-    </Card>
+      ))}
+    </div>
+  )
+}
+
+export default function ProductImagesForm() {
+  const { addImage, images } = useAddProductStore()
+  const [isDragging, setIsDragging] = useState(false)
+
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    acceptedFiles.forEach((file, index) => {
+      const imageUrl = URL.createObjectURL(file)
+      addImage({
+        productId: 0,
+        imageUrl,
+        isMain: images.length === 0 && index === 0,
+      })
+    })
+  }, [addImage, images.length])
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {'image/*': []},
+    onDragEnter: () => setIsDragging(true),
+    onDragLeave: () => setIsDragging(false),
+  })
+
+  return (
+    <div className="space-y-4">
+      <div
+        {...getRootProps()}
+        className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+          isDragging ? 'border-primary bg-primary/10' : 'border-muted-foreground/25'
+        }`}
+      >
+        <input {...getInputProps()} />
+        <div className="flex flex-col items-center justify-center text-muted-foreground">
+          <Upload className="h-12 w-12 mb-4" />
+          <p className="text-lg font-medium mb-1">Drag & drop product images here</p>
+          <p className="text-sm">or click to select files</p>
+        </div>
+      </div>
+
+      {images.length > 0 && (
+        <div className="bg-muted p-4 rounded-lg">
+          <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
+            <ImageIcon className="h-5 w-5" />
+            Uploaded Images
+          </h3>
+          <ImagePreview />
+        </div>
+      )}
+    </div>
   )
 }

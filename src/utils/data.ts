@@ -5,7 +5,8 @@ import {
   Users2,
   LineChart,
   Settings,
-  Tags
+  Tags,
+  ListTree
 } from "lucide-react";
 import { NavItem, Product } from "@/utils/types";
 
@@ -14,7 +15,8 @@ export const navItems: NavItem[] = [
   { icon: ShoppingCart, label: "Orders" },
   { icon: Package, label: "Product" },
   { icon: Users2, label: "Customers" },
-  {icon: Tags, label: "Brands"},
+  { icon: Tags, label: "Brands" },
+  { icon: ListTree, label: "Categories" },
   { icon: LineChart, label: "Analytics" },
   { icon: Settings, label: "Settings" },
 ];

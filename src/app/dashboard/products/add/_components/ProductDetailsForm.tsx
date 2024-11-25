@@ -1,22 +1,45 @@
+"use client";
+
+import useAddProductStore from "@/utils/stores/addProduct";
 import {
   Card,
-  CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
+  CardDescription,
+  CardContent,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
-  SelectContent,
-  SelectItem,
   SelectTrigger,
   SelectValue,
+  SelectContent,
+  SelectItem,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+import { BrandType, CategoryType } from "@/server/db/schema";
 
-export default function ProductDetailsForm() {
+interface ProductDetailsFormProps {
+  brands: BrandType[];
+  categories: CategoryType[];
+}
+
+export function ProductDetailsForm({
+  brands,
+  categories,
+}: ProductDetailsFormProps) {
+  const {
+    name,
+    description,
+    brandId,
+    categoryId,
+    setName,
+    setDescription,
+    setBrandId,
+    setCategoryId,
+  } = useAddProductStore();
+
   return (
     <Card>
       <CardHeader>
@@ -30,8 +53,8 @@ export default function ProductDetailsForm() {
           <Label htmlFor="name">Name</Label>
           <Input
             id="name"
-            name="name"
-            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             placeholder="Enter product name"
             required
           />
@@ -40,50 +63,63 @@ export default function ProductDetailsForm() {
           <Label htmlFor="description">Description</Label>
           <Textarea
             id="description"
-            name="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
             placeholder="Enter product description"
             className="min-h-[100px]"
             required
           />
         </div>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-3">
           <div className="space-y-2">
             <Label htmlFor="brand">Brand</Label>
-            <Select name="brand" required>
+            <Select
+              value={brandId.toString()}
+              onValueChange={(value) => setBrandId(Number(value))}
+            >
               <SelectTrigger id="brand">
                 <SelectValue placeholder="Select brand" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="brand1">Brand 1</SelectItem>
-                <SelectItem value="brand2">Brand 2</SelectItem>
-                <SelectItem value="brand3">Brand 3</SelectItem>
+                {brands.map((brand) => (
+                  <SelectItem key={brand.id} value={brand.id.toString()}>
+                    {brand.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-2">
             <Label htmlFor="category">Category</Label>
-            <Select name="category" required>
+            <Select
+              value={categoryId.toString()}
+              onValueChange={(value) => setCategoryId(Number(value))}
+            >
               <SelectTrigger id="category">
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="category1">Category 1</SelectItem>
-                <SelectItem value="category2">Category 2</SelectItem>
-                <SelectItem value="category3">Category 3</SelectItem>
+                {categories.map((category) => (
+                  <SelectItem key={category.id} value={category.id.toString()}>
+                    {category.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="base_price">Base Price</Label>
-          <Input
-            id="base_price"
-            name="base_price"
-            type="number"
-            placeholder="Enter base price"
-            step="0.01"
-            required
-          />
+          <div className="space-y-2">
+            <Label htmlFor="status">Status</Label>
+            <Select defaultValue="draft">
+              <SelectTrigger id="status">
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="draft">Draft</SelectItem>
+                <SelectItem value="published">Published</SelectItem>
+                <SelectItem value="archived">Archived</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </CardContent>
     </Card>

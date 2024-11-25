@@ -1,10 +1,14 @@
-import AddProductForm from "./_components/AddProductForm";
+import { getAllBrands, getCategories } from "@/server/db/queries"
+import AddProductForm from "./_components/AddProductForm"
 
-const AddProductPage = () => {
-  return (
+const AddProductPage = async () => {
+  const [brands, categories] = await Promise.all([getAllBrands(), getCategories()])
+
+  return (  
     <div>
-      <AddProductForm/>
+      <AddProductForm brands={brands} categories={categories} />
     </div>
-  );
-};  
-export default AddProductPage;
+  )
+}
+
+export default AddProductPage

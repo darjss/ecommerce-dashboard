@@ -6,12 +6,10 @@ import { useFormState, useFormStatus } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Loader2,
-  Mail,
   Eye,
   EyeOff,
   AlertCircle,
-  User,
-  username,
+
 } from "lucide-react";
 import { z } from "zod";
 
@@ -143,7 +141,7 @@ export default function SignUpForm() {
                   username Number
                 </Label>
                 <div className="relative">
-                  <username className="absolute left-3 top-1/2 -translate-y-1/2 transform text-gray-400" />
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 transform text-gray-400" />
                   <Input
                     id="username"
                     name="username"

@@ -6,6 +6,8 @@ import {
   ProductType,
   ProductDetailsType,
   ProductImagesType,
+  CategoryType,
+  BrandType,
 } from "@/server/db/schema";
 
 export interface AmazonScrapeProduct {
@@ -14,14 +16,33 @@ export interface AmazonScrapeProduct {
   thumbnailUrl: string;
 }
 
-export interface AmazonProductImages {
-  mainImageUrl: string;
+export interface AmazonProductDetails {
+  productName: string;
+  price: string;
+  description: string[];
+  mainImageUrl: string | undefined;
   additionalImages: string[];
+}
+
+
+export interface AddProductType {
+  name: string;
+  description: string;
+  brandId: string;
+  categoryId: string;
+  productId: string;
+  price: string;
+  stock: number;
+  status: string;
+  capsuleCount?: number;
+  potency?: string;
+  imageUrl: string;
+  isMain: boolean;
 }
 
 export interface CompleteProductInsertType {
   general: ProductInsertType;
-  details: ProductDetailsInsertType[];
+  variations: ProductDetailsInsertType[];
   images: ProductImagesInsertType[];
 }
 export interface CompleteProductType {
@@ -33,30 +54,33 @@ export interface CompleteProductType {
 export interface ActionResult {
   error: string;
 }
-export interface ProductDetail {
-  id: string;
-  variationName: string;
-  capsuleCount: number | null;
-  potency: string | null;
+
+export interface ProductDetail{
+  id: number;
+  productId: number;
   price: string;
   stock: number;
   status: string;
+  capsuleCount: number;
+  potency: string;
+  createdAt: string;  
+  updatedAt: string;
 }
 
 export interface Product {
-  id: string;
+  id: number;
   name: string;
   description: string;
-  brand: string;
-  category: string;
-  image_url: string;
   details: ProductDetail[];
+  imageUrl: string;
+  brandName: string;
+  categoryName: string;
 }
 export interface NavItem {
   icon: LucideIcon;
   label: string;
 }
-export type SortField = keyof ProductDetail;
+export type SortField = keyof ProductDetailsType;
 
 export type SortOrder = "asc" | "desc";
 
@@ -70,5 +94,7 @@ export type Filter = {
   status: string | null;
   brand: string | null;
 };
+
+
 
 export type ViewMode = "table" | "grid";

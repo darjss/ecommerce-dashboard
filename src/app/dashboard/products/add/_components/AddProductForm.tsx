@@ -1,74 +1,62 @@
-"use client";
-
-import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import ProductDetailsForm from "./ProductDetailsForm";
+import { ProductDetailsForm } from "./ProductDetailsForm";
 import ProductVariationsForm from "./ProductVariationsForm";
-import ProductStatusForm from "./ProductStatusForm";
 import ProductImagesForm from "./ProductImagesForm";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
+import { ProductSearch } from "./ProductSearch";
+import { BrandType, CategoryType } from "@/server/db/schema";
+import AddProductButton from "./AddProductButton";
 
-export default function AddProductForm() {
-  const [variations, setVariations] = useState([
-    {
-      id: 1,
-      name: "Default",
-      capsuleCount: 30,
-      potency: "500mg",
-      price: "29.99",
-      stock: 100,
-      isDefault: true,
-    },
-  ]);
+interface AddProductFormProps {
+  brands: BrandType[];
+  categories: CategoryType[];
+}
 
-  const addVariation = () => {
-    const newVariation = {
-      id: variations.length + 1,
-      name: `Variation ${variations.length + 1}`,
-      capsuleCount: 30,
-      potency: "",
-      price: "",
-      stock: 0,
-      isDefault: false,
-    };
-    setVariations([...variations, newVariation]);
-  };
-
-  const removeVariation = (id: number) => {
-    setVariations(variations.filter((v) => v.id !== id));
-  };
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    // Here you would typically call your server action
-    // For example: await addProduct(new FormData(event.currentTarget))
-    console.log("Form submitted");
-  };
-
+export default async function AddProductForm({
+  brands,
+  categories,
+}: AddProductFormProps) {
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Add New Product</h1>
-        <div className="flex items-center gap-4">
-          <Badge variant="outline">Draft</Badge>
-          <Button type="submit">Save Product</Button>
-        </div>
-      </div>
+    <div className="container mx-auto max-w-4xl space-y-8 px-4 py-6">
+      <Card>
+        <CardHeader className="space-y-2">
+          <CardTitle className="text-2xl md:text-3xl">
+            Add New Product
+          </CardTitle>
+          <CardDescription className="text-sm md:text-base">
+            Search Amazon or upload your own images
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-8">
+          <ProductSearch />
 
-      <div className="grid gap-8 md:grid-cols-[2fr_1fr]">
-        <div className="space-y-8">
-          <ProductDetailsForm />
-          <ProductVariationsForm
-            variations={variations}
-            addVariation={addVariation}
-            removeVariation={removeVariation}
-          />
-        </div>
-        <div className="space-y-8">
-          <ProductStatusForm />
-          <ProductImagesForm />
-        </div>
-      </div>
-    </form>
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">
+                Or
+              </span>
+            </div>
+          </div>
+
+          <div className="space-y-8">
+            <ProductDetailsForm brands={brands} categories={categories} />
+            <ProductVariationsForm />
+            <ProductImagesForm />
+          </div>
+
+          <div className="sticky bottom-4 mt-8 flex justify-center pt-4">
+            <AddProductButton />
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

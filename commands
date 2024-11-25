@@ -1,0 +1,12 @@
+# Create new directories
+mkdir -p src/app/dashboard/products/all/_components/{table,grid,dialogs,actions}
+mkdir -p src/app/dashboard/products/add/_components/buttons
+
+# Move files to new locations
+mv src/app/dashboard/products/all/_components/AllProductTable.tsx src/app/dashboard/products/all/_components/table/
+mv src/app/dashboard/products/all/_components/ProductRow.tsx src/app/dashboard/products/all/_components/table/
+mv src/app/dashboard/products/all/_components/ProductGridCard.tsx src/app/dashboard/products/all/_components/grid/
+mv src/app/dashboard/products/all/_components/EditProductDetails.tsx src/app/dashboard/products/all/_components/dialogs/
+mv src/app/dashboard/products/all/_components/EditStockDialog.tsx src/app/dashboard/products/all/_components/dialogs/
+mv src/app/dashboard/products/all/_components/ProductActions.tsx src/app/dashboard/products/all/_components/actions/
+mv src/app/dashboard/products/add/_components/AddProductButton.tsx src/app/dashboard/products/add/_components/buttons/ 

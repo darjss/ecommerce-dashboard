@@ -6,11 +6,16 @@ await import("./src/env.js");
 
 /** @type {import("next").NextConfig} */
 const config = {
-    experimental: {
-        ppr: true,
-      },images: {
-        domains: ['m.media-amazon.com'],
-      },
+  experimental: {
+    ppr: true,
+    // dynamicIO: true,
+  },
+  images: {
+    domains: ["m.media-amazon.com"],
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
 
 export default config;

@@ -36,3 +36,17 @@
 
 //   return session ? { user, session } : null;
 // }
+export const getStatusVariant = (
+    status: string,
+  ): "default" | "secondary" | "destructive" => {
+    switch (status.toLowerCase()) {
+      case "in stock":
+        return "default";
+      case "low stock":
+        return "secondary";
+      case "out of stock":
+        return "destructive";
+      default:
+        return "default";
+    }
+  };

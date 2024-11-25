@@ -46,7 +46,7 @@ export const sessions = createTable("adminSession", {
 export const brands = createTable("brand", {
   id: int("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
-  logo_url: text("logo_url").notNull(),
+  logoUrl: text("logo_url").notNull(),
   createdAt: int("created_at", { mode: "timestamp" })
     .default(sql`(unixepoch())`)
     .notNull(),
@@ -74,8 +74,8 @@ export const products = createTable("product", {
   id: int("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
   description: text("description").notNull(),
-  brand_id: text("brand_id").notNull().references(() => brands.id),
-  category_id: text("category_id").notNull().references(() => categories.id),
+  brandId: int("brand_id").notNull().references(() => brands.id),
+  categoryId: int("category_id").notNull().references(() => categories.id),
   createdAt: int("created_at", { mode: "timestamp" })
     .default(sql`(unixepoch())`)
     .notNull(),
@@ -84,14 +84,13 @@ export const products = createTable("product", {
   ),
 }, (table) => ({
   nameIdx: index("product_name_idx").on(table.name),
-  brandIdIdx: index("product_brand_id_idx").on(table.brand_id),
-  categoryIdIdx: index("product_category_id_idx").on(table.category_id),
+  brandIdIdx: index("product_brand_id_idx").on(table.brandId),
+  categoryIdIdx: index("product_category_id_idx").on(table.categoryId),
 }));
 
 export const productDetails = createTable("product_details", {
   id: int("id").primaryKey({ autoIncrement: true }),
-  productId: text("product_id").notNull().references(() => products.id),
-  variationName: text("variationName").notNull(),
+  productId: int("product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
   capsuleCount: int("capsuleCount"),
   potency: text("potency"),
   price: text("price").notNull(),
@@ -111,8 +110,9 @@ export const productDetails = createTable("product_details", {
 
 export const productImages = createTable("product_images", {
   id: int("id").primaryKey({ autoIncrement: true }),
-  productId: text("product_id").notNull().references(() => productDetails.id),
-  image_url: text("image_url").notNull(),
+  productId: int("product_id").notNull().references(() => products.id, { onDelete: "cascade" }),  
+  imageUrl: text("image_url").notNull(),
+  isMain: int("isMain", {mode:"boolean"}).notNull(),
   createdAt: int("created_at", { mode: "timestamp" })
     .default(sql`(unixepoch())`)
     .notNull(),
@@ -125,10 +125,10 @@ export const productImages = createTable("product_images", {
 
 export const orders = createTable("order", {
   id: int("id").primaryKey({ autoIncrement: true }),
-  user_id: text("user_id").notNull().references(() => users.id),
-  order_date: int("order_date").notNull(),
+  userId: int("user_id").notNull().references(() => users.id),
+  orderDate: int("order_date").notNull(),
   status: text("status").notNull(),
-  total_price: int("total_price").notNull(),
+  totalPrice: int("total_price").notNull(),
   createdAt: int("created_at", { mode: "timestamp" })
     .default(sql`(unixepoch())`)
     .notNull(),
@@ -136,15 +136,15 @@ export const orders = createTable("order", {
     () => new Date(),
   ),
 }, (table) => ({
-  userIdIdx: index("order_user_id_idx").on(table.user_id),
-  orderDateIdx: index("order_date_idx").on(table.order_date),
+  userIdIdx: index("order_user_id_idx").on(table.userId),
+  orderDateIdx: index("order_date_idx").on(table.orderDate),
   statusIdx: index("order_status_idx").on(table.status),
 }));
 
 export const orderDetails = createTable("order_details", {
   id: int("id").primaryKey({ autoIncrement: true }),
-  order_id: text("order_id").notNull().references(() => orders.id),
-  product_id: text("product_id").notNull().references(() => productDetails.id),
+  orderId: int("order_id").notNull().references(() => orders.id),
+  productId: int("product_id").notNull().references(() => productDetails.id),
   quantity: int("quantity").notNull(),
   createdAt: int("created_at", { mode: "timestamp" })
     .default(sql`(unixepoch())`)
@@ -153,13 +153,13 @@ export const orderDetails = createTable("order_details", {
     () => new Date(),
   ),
 }, (table) => ({
-  orderIdIdx: index("order_details_order_id_idx").on(table.order_id),
-  productIdIdx: index("order_details_product_id_idx").on(table.product_id),
+  orderIdIdx: index("order_details_order_id_idx").on(table.orderId),
+  productIdIdx: index("order_details_product_id_idx").on(table.productId),
 }));
 
 export const sessionCart = createTable("session_cart", {
   id: int("id").primaryKey({ autoIncrement: true }),
-  session_id: text("session_id").notNull().references(() => sessions.id),
+  sessionId: int("session_id").notNull().references(() => sessions.id),
   createdAt: int("created_at", { mode: "timestamp" })
     .default(sql`(unixepoch())`)
     .notNull(),
@@ -167,12 +167,12 @@ export const sessionCart = createTable("session_cart", {
     () => new Date(),
   ),
 }, (table) => ({
-  sessionIdIdx: index("session_cart_session_id_idx").on(table.session_id),
+  sessionIdIdx: index("session_cart_session_id_idx").on(table.sessionId),
 }));
 
 export const userCart = createTable("user_cart", {
   id: int("id").primaryKey({ autoIncrement: true }),
-  user_id: text("user_id").notNull().references(() => users.id),
+  userId: int("user_id").notNull().references(() => users.id),
   createdAt: int("created_at", { mode: "timestamp" })
     .default(sql`(unixepoch())`)
     .notNull(),
@@ -180,14 +180,14 @@ export const userCart = createTable("user_cart", {
     () => new Date(),
   ),
 }, (table) => ({  
-  userIdIdx: index("user_cart_user_id_idx").on(table.user_id),
+  userIdIdx: index("user_cart_user_id_idx").on(table.userId),
 }));
 
 export const cartItems = createTable("cart_items", {
   id: int("id").primaryKey({ autoIncrement: true }),
-  session_cart_id: text("session_cart_id").references(() => sessionCart.id),
-  user_cart_id: text("user_cart_id").references(() => userCart.id),
-  product_id: text("product_id").notNull().references(() => productDetails.id),
+  sessionCartId: int("session_cart_id").references(() => sessionCart.id),
+  userCartId: int("user_cart_id").references(() => userCart.id),
+  productId: int("product_id").notNull().references(() => productDetails.id),
   quantity: int("quantity").notNull(),
   createdAt: int("created_at", { mode: "timestamp" })
     .default(sql`(unixepoch())`)
@@ -196,14 +196,14 @@ export const cartItems = createTable("cart_items", {
     () => new Date(),
   ),
 }, (table) => ({
-  sessionCartIdIdx: index("cart_items_session_cart_id_idx").on(table.session_cart_id),
-  userCartIdIdx: index("cart_items_user_cart_id_idx").on(table.user_cart_id),
-  productIdIdx: index("cart_items_product_id_idx").on(table.product_id),
+  sessionCartIdIdx: index("cart_items_session_cart_id_idx").on(table.sessionCartId),
+  userCartIdIdx: index("cart_items_user_cart_id_idx").on(table.userCartId),
+  productIdIdx: index("cart_items_product_id_idx").on(table.productId),
 }));
 
 export const Payment = createTable("payment", {
   id: int("id").primaryKey({ autoIncrement: true }),
-  order_id: text("order_id").notNull().references(() => orders.id),
+  order_id: int("order_id").notNull().references(() => orders.id),
   payment_provider: text("payment_provider").notNull(),
   status: text("status").notNull(),
   payment_date: int("payment_date").notNull(),
