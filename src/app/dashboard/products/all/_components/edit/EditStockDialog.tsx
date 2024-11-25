@@ -14,32 +14,24 @@ import { useState } from "react";
 import Spinning from "@/lib/svg/Spinning";
 import { updateProductDetails } from "@/server/db/queries";
 import { ProductDetail } from "@/utils/types";
+import { ProductDetailsType } from "@/server/db/schema";
 
 interface EditStockDialogProps {
   details: ProductDetail[];
 }
 
-interface StockUpdate {
-  id: number;
-  quantity: number;
-}
 
-interface ProductDetailUpdateInput {
-  id: number;
-  quantity: number;
-  // Add other fields if necessary
-}
 
 export default function EditStockDialog({ details }: EditStockDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
-  const [stockUpdates, setStockUpdates] = useState<StockUpdate[]>([]);
+  const [stockUpdates, setStockUpdates] = useState<ProductDetailsType[]>([]);
 
   const handleUpdateStock = async () => {
     setIsLoading(true);
     try {
       const updatePromises = stockUpdates.map((update) => 
-        updateProductDetails({ id: update.id, quantity: update.quantity })
+        updateProductDetails(update)
       );
       await Promise.all(updatePromises);
       setOpen(false); // Close dialog after successful update
@@ -61,13 +53,13 @@ export default function EditStockDialog({ details }: EditStockDialogProps) {
             : update,
         );
       }
-      return [...prev, { id: detailId, quantity: newQuantity }];
+      return [...prev];
     });
   };
 
   const getUpdatedQuantity = (detailId: number, originalQuantity: number) => {
     const update = stockUpdates.find((update) => update.id === detailId);
-    return update ? update.quantity : originalQuantity;
+    return update ? update.stock : originalQuantity;
   };
 
   return (

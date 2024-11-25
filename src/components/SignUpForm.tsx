@@ -102,7 +102,6 @@ function ErrorMessage({ message }: { message: string | undefined }) {
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
-      className="mt-1 flex items-center text-sm text-red-500"
     >
       <AlertCircle className="mr-1 h-4 w-4" />
       {message}
@@ -120,7 +119,6 @@ export default function SignUpForm() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md"
       >
         <Card className="border-0 shadow-xl">
           <CardHeader className="space-y-1">

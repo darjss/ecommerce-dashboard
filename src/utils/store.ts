@@ -72,12 +72,7 @@ useProductStore.subscribe((state) => {
     .filter((product) =>
       product.name.toLowerCase().includes(searchTerm.toLowerCase()),
     )
-    .filter((product) =>
-      filters.category ? product.category === filters.category : true,
-    )
-    .filter((product) =>
-      filters.brand ? product.brand === filters.brand : true,
-    )
+
     .filter((product) =>
       filters.status
         ? product.details.some((detail) => detail.status === filters.status)
